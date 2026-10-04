@@ -17,12 +17,17 @@ const sanitizeBrandString = (val?: string): string => {
   return val
     .replace(/liyau_logo\.svg/gi, 'khojau_logo.svg')
     .replace(/leyau_logo\.svg/gi, 'khojau_logo.svg')
+    .replace(/Liyau\s+Thinker/gi, 'Khojau Saathi')
+    .replace(/Khojau\s+Thinker/gi, 'Khojau Saathi')
+    .replace(/Ask\s+Thinker/gi, 'Ask Saathi')
     .replace(/Liyau/g, 'Khojau')
     .replace(/Leyau/g, 'Khojau')
     .replace(/liyau/g, 'khojau')
     .replace(/leyau/g, 'khojau')
     .replace(/LIYAU/g, 'KHOJAU')
     .replace(/LEYAU/g, 'KHOJAU')
+    .replace(/लियौँ/g, 'खोजौँ')
+    .replace(/लियौं/g, 'खोजौँ')
     .replace(/लिऔँ/g, 'खोजौँ')
     .replace(/लिऔं/g, 'खोजौँ')
     .replace(/लेऔँ/g, 'खोजौँ');
@@ -48,6 +53,7 @@ const normalizeStoreSettings = (s: StoreSettings): StoreSettings => {
     heroSubtitle: sanitizeBrandString(s.heroSubtitle),
     contactEmail: sanitizeBrandString(s.contactEmail),
     storeAddress: sanitizeBrandString(s.storeAddress),
+    announcementText: sanitizeBrandString(s.announcementText),
     deliveryInfoText: sanitizeBrandString(s.deliveryInfoText),
     returnPolicyText: sanitizeBrandString(s.returnPolicyText),
     founder: {
@@ -65,6 +71,7 @@ const normalizeStoreSettings = (s: StoreSettings): StoreSettings => {
     aiSettings: s.aiSettings
       ? {
           ...s.aiSettings,
+          assistantName: sanitizeBrandString(s.aiSettings.assistantName || 'Khojau Saathi'),
           welcomeMessage: sanitizeBrandString(s.aiSettings.welcomeMessage),
           customPrompt: sanitizeBrandString(s.aiSettings.customPrompt),
         }
@@ -113,14 +120,14 @@ export interface LocalStoreDB {
   adminCredentials?: LocalAdminCredentials;
 }
 
-const LOCAL_DB_KEY = 'khojau_static_store_db_v2';
+const LOCAL_DB_KEY = 'khojau_static_store_db_v3';
 
 export function getLocalStoreDB(): LocalStoreDB {
   try {
-    // Purge any legacy v1 or liyau/leyau keys that may hold old cached settings on other devices
+    // Purge any legacy v1/v2 or liyau/leyau keys that may hold old cached settings on other devices
     for (let i = localStorage.length - 1; i >= 0; i--) {
       const k = localStorage.key(i);
-      if (k && (k === 'khojau_static_store_db_v1' || /liyau|leyau/i.test(k))) {
+      if (k && (k === 'khojau_static_store_db_v1' || k === 'khojau_static_store_db_v2' || /liyau|leyau/i.test(k))) {
         localStorage.removeItem(k);
       }
     }
